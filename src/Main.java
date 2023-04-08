@@ -48,29 +48,6 @@ public class Main {
         //Because we want to get the current char, we didn't call readNextCh. But in other cases, we should use.
         char ch = line.charAt(currentIndex);
 
-        //Bracket Control
-        switch (ch){
-            case '(':
-                System.out.println("LEFTPAR "+currentLine+":"+ ++currentIndex);
-                break;
-            case ')':
-                System.out.println("RIGHTPAR "+currentLine+":"+ ++currentIndex);
-                break;
-            case '[':
-                System.out.println("LEFTSQUAREB "+currentLine+":"+ ++currentIndex);
-                break;
-            case ']':
-                System.out.println("RIGHTSQUAREB "+currentLine+":"+ ++currentIndex);
-                break;
-            case '{':
-                System.out.println("LEFTCURLYB "+currentLine+":"+ ++currentIndex);
-                break;
-            case '}':
-                System.out.println("RIGHTCURLYB "+currentLine+":"+ ++currentIndex);
-                break;
-            default: //Will be deleted, for now, currentIndex must be incremented in somewhere.
-                //IMPORTANT: If you are working on your function, DELETE THIS DEFAULT PART and do not forget
-                //to increment currentIndex if none of the tokens are available now.
                 ++currentIndex;
         }
 
