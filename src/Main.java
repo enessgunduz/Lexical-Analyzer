@@ -74,6 +74,8 @@ public class Main {
                 ++currentIndex;
         }
 
+        //asd
+
         //Check if it is a letter
 
         //Check if it is a number
