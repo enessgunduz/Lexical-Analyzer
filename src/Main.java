@@ -85,6 +85,12 @@ public class Main {
                 // to increment currentIndex if none of the tokens are available now.
                 ++currentIndex;
         }
+
+        // Comment Control
+        if(ch == '~'){
+            line = readLn(br);
+        }
+
         // Check if it is a letter
 
         // Check if it is a number
