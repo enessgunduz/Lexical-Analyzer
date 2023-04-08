@@ -49,44 +49,42 @@ public class Main {
         char ch = line.charAt(currentIndex);
 
         //Bracket Control
-        switch (ch){
+        switch (ch) {
             case '(':
-                System.out.println("LEFTPAR "+currentLine+":"+ ++currentIndex);
+                System.out.println("LEFTPAR " + currentLine + ":" + ++currentIndex);
                 break;
             case ')':
-                System.out.println("RIGHTPAR "+currentLine+":"+ ++currentIndex);
+                System.out.println("RIGHTPAR " + currentLine + ":" + ++currentIndex);
                 break;
             case '[':
-                System.out.println("LEFTSQUAREB "+currentLine+":"+ ++currentIndex);
+                System.out.println("LEFTSQUAREB " + currentLine + ":" + ++currentIndex);
                 break;
             case ']':
-                System.out.println("RIGHTSQUAREB "+currentLine+":"+ ++currentIndex);
+                System.out.println("RIGHTSQUAREB " + currentLine + ":" + ++currentIndex);
                 break;
             case '{':
-                System.out.println("LEFTCURLYB "+currentLine+":"+ ++currentIndex);
+                System.out.println("LEFTCURLYB " + currentLine + ":" + ++currentIndex);
                 break;
             case '}':
-                System.out.println("RIGHTCURLYB "+currentLine+":"+ ++currentIndex);
+                System.out.println("RIGHTCURLYB " + currentLine + ":" + ++currentIndex);
                 break;
             default: //Will be deleted, for now, currentIndex must be incremented in somewhere.
                 //IMPORTANT: If you are working on your function, DELETE THIS DEFAULT PART and do not forget
                 //to increment currentIndex if none of the tokens are available now.
                 ++currentIndex;
         }
+                //Check if it is a letter
 
-        //asd
+                //Check if it is a number
 
-        //Check if it is a letter
+                //All cases must be checked here.
 
-        //Check if it is a number
-
-        //All cases must be checked here.
-
-        /*YOUR FUNCTIONS MUST BE HERE!*/
+                /*YOUR FUNCTIONS MUST BE HERE!*/
 
 
-        //Recursion baby, there must be no code after this line in this function.
-        identify(br,line);
+                //Recursion baby, there must be no code after this line in this function.
+                identify(br,line);
+        }
 
-    }
 }
+
