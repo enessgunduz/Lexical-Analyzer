@@ -91,6 +91,11 @@ public class Main {
             line = readLn(br);
         }
 
+        // Space Control
+        if (ch == ' '){
+            ++currentIndex;
+        }
+
         // Check if it is a letter
 
         // Check if it is a number
