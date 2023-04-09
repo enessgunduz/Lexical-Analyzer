@@ -100,8 +100,15 @@ public class Main {
         // Check if it is a letter
 
         // Check if it is a number
-        if (ch == '-' || ch == '+' || (ch >= '0' && ch <= '9') || ch == '.'){
+        if (ch == '-' || ch == '+' || (ch >= '0' && ch <= '9') || ch == '.')
             numberLiterals(br, line);
+
+
+        if (ch == '\'')
+            charLiteral(br,line);
+
+        if (ch == '"'){
+            stringLiteral(br, line);
         }
 
         // All cases must be checked here.
@@ -112,6 +119,68 @@ public class Main {
         identify(br, line);
     }
 
+
+    public static void charLiteral(BufferedReader br, String line) throws IOException {
+        int outputIndex = currentIndex+1; //for output purposes
+        char ch = readNextCh(line);
+
+        if (ch == '\''){
+            promtError(currentLine,outputIndex);
+        }
+        else if (ch == '\\'){
+            ch = readNextCh(line);
+            if (ch != '\''){
+                promtError(currentLine,outputIndex);
+            }else {
+                ch = readNextCh(line);
+                if (ch != '\''){
+                    promtError(currentLine,outputIndex);
+                }
+            }
+
+        } else if (!(ch >= 32 && ch <= 126)) {
+            promtError(currentLine,outputIndex);
+        } else {
+            ch = readNextCh(line);
+            if (ch != '\''){
+                promtError(currentLine,outputIndex);
+            }
+
+        }
+        System.out.println("CHAR "+ currentLine+":"+outputIndex);
+        readNextCh(line);
+        identify(br,line);
+
+
+    }
+
+    public static void stringLiteral(BufferedReader br, String line) throws IOException {
+        int outputIndex = currentIndex+1; //for output purposes
+        char chOld = line.charAt(currentIndex);
+        char ch = readNextCh(line);
+        if (!(ch >= 32 && ch <= 126)){
+            promtError(currentLine,outputIndex);
+        }
+        if (ch == '"'){
+
+        }
+
+        while (ch >= 32 && ch <= 126){
+            chOld = ch;
+            ch = readNextCh(line);
+            if (ch == '"' && chOld != '\\'){
+                break;
+            }
+
+            if (!(ch >= 32 && ch <= 126) || ch == '#')
+                promtError(currentLine,outputIndex);
+        }
+
+        System.out.println("STRING "+ currentLine+":"+outputIndex);
+        readNextCh(line);
+        identify(br,line);
+
+    }
 
     public static void numberLiterals(BufferedReader br, String line) throws IOException {
         char ch = line.charAt(currentIndex);
@@ -148,8 +217,7 @@ public class Main {
                 }
                 if (!hexCond(ch) && ch!='#'){
 
-                    System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
-                    System.exit(0);
+                    promtError(currentLine,outputIndex);
                 }
             }
             while (bin && binCond(ch)){
@@ -158,8 +226,7 @@ public class Main {
                     break;
                 }
                 if (!binCond(ch)&& ch!='#'){
-                    System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
-                    System.exit(0);
+                    promtError(currentLine,outputIndex);
                 }
             }
         } else if (decCond(ch)){
@@ -178,13 +245,11 @@ public class Main {
                 }
 
                 if (!decCond(ch)){
-                    System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
-                    System.exit(0);
+                    promtError(currentLine,outputIndex);
                 }
             }
         } else {
-            System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
-            System.exit(0);
+            promtError(currentLine,outputIndex);
         }
 
 
@@ -199,8 +264,7 @@ public class Main {
         ch = readNextCh(line);
         if (cond == 0){
             if (!decCond(ch)){
-                System.out.println(ch+" a Unexpected Token at "+currentLine+":"+outputIndex);
-                System.exit(0);
+                promtError(currentLine,outputIndex);
             }
             while (decCond(ch)){
                 ch = readNextCh(line);
@@ -213,8 +277,7 @@ public class Main {
                 }
 
                 if (!decCond(ch) && ch!='#'){
-                    System.out.println(ch + " b Unexpected Token at "+currentLine+":"+outputIndex);
-                    System.exit(0);
+                    promtError(currentLine,outputIndex);
                 }
             }
 
@@ -222,8 +285,7 @@ public class Main {
 
         } else if (cond == 1){
             if (ch != '+' && ch != '-' && !decCond(ch)){
-                System.out.println(ch + " c Unexpected Token at "+currentLine+":"+outputIndex);
-                System.exit(0);
+                promtError(currentLine,outputIndex);
             }
 
             ch = readNextCh(line);
@@ -234,8 +296,7 @@ public class Main {
                 }
 
                 if (!decCond(ch)&& ch!='#'){
-                    System.out.println(ch + " d Unexpected Token at "+currentLine+":"+outputIndex);
-                    System.exit(0);
+                    promtError(currentLine,outputIndex);
                 }
             }
 
@@ -261,6 +322,11 @@ public class Main {
 
     public static boolean bracketCond(char ch){
         return (ch == '(' || ch == ')' || ch == '['|| ch == ']'|| ch == '{'|| ch == '}');
+    }
+
+    public static void promtError(int line, int index){
+        System.out.println("Unexpected Token at "+line+":"+index);
+        System.exit(0);
     }
 
 }
