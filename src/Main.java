@@ -1,3 +1,5 @@
+import javax.lang.model.util.ElementScanner6;
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -37,8 +39,12 @@ public class Main {
      * This function stands for reading next character. It also increments
      * currentIndex.
      */
-    public static char readNextCh(String line) throws IOException {
-        return line.charAt(++currentIndex);
+    public static char readNextCh(String line)  {
+        currentIndex++;
+        if (line.length() < currentIndex+1) {
+            return '#';
+        }
+        return line.charAt(currentIndex);
     }
 
     /*
@@ -52,7 +58,7 @@ public class Main {
         if (line.length() < currentIndex + 1) {
             line = readLn(br);
             if (line == null)
-                return;
+                System.exit(0);
         }
 
         // Because we want to get the current char, we didn't call readNextCh. But in
@@ -79,11 +85,6 @@ public class Main {
             case '}':
                 System.out.println("RIGHTCURLYB " + currentLine + ":" + ++currentIndex);
                 break;
-            default: // Will be deleted, for now, currentIndex must be incremented in somewhere.
-                // IMPORTANT: If you are working on your function, DELETE THIS DEFAULT PART and
-                // do not forget
-                // to increment currentIndex if none of the tokens are available now.
-                ++currentIndex;
         }
 
         // Comment Control
@@ -99,6 +100,9 @@ public class Main {
         // Check if it is a letter
 
         // Check if it is a number
+        if (ch == '-' || ch == '+' || (ch >= '0' && ch <= '9') || ch == '.'){
+            numberLiterals(br, line);
+        }
 
         // All cases must be checked here.
 
@@ -106,6 +110,157 @@ public class Main {
 
         // Recursion baby, there must be no code after this line in this function.
         identify(br, line);
+    }
+
+
+    public static void numberLiterals(BufferedReader br, String line) throws IOException {
+        char ch = line.charAt(currentIndex);
+        int outputIndex = currentIndex+1; //for output purposes
+
+        boolean hexOrBin = false ,hex = false, bin = false;
+
+        if (ch == '.'){
+            floatLiteral(br,line,0, outputIndex);
+            return;
+        } else if (ch == '0'){ //Could be hex or bin
+            hexOrBin=true;
+        }
+
+        ch = readNextCh(line);
+        if (ch == '.'){
+            floatLiteral(br,line,0, outputIndex);
+            return;
+        }
+
+        /*Bin or hex works*/
+        if (hexOrBin && (ch == 'x' || ch =='b')){
+            if (ch == 'x')
+                hex = true;
+            else
+                bin = true;
+
+            ch = readNextCh(line);
+
+            while (hex && hexCond(ch)){
+                ch = readNextCh(line);
+                if (bracketCond(ch) || ch ==' '){
+                    break;
+                }
+                if (!hexCond(ch) && ch!='#'){
+
+                    System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
+                    System.exit(0);
+                }
+            }
+            while (bin && binCond(ch)){
+                ch = readNextCh(line);
+                if (bracketCond(ch)|| ch ==' '){
+                    break;
+                }
+                if (!binCond(ch)&& ch!='#'){
+                    System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
+                    System.exit(0);
+                }
+            }
+        } else if (decCond(ch)){
+            /*simple number literals*/
+            while (true){
+                ch = readNextCh(line);
+                if (ch == 'e' || ch == 'E'){
+                    floatLiteral(br, line, 1, outputIndex);
+                    return;
+                } else if (ch == '.'){
+                    floatLiteral(br, line, 0, outputIndex);
+                    return;
+                }
+                if (bracketCond(ch) || ch ==' '){
+                    break;
+                }
+
+                if (!decCond(ch)){
+                    System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
+                    System.exit(0);
+                }
+            }
+        } else {
+            System.out.println("Unexpected Token at "+currentLine+":"+outputIndex);
+            System.exit(0);
+        }
+
+
+        System.out.println("NUMBER "+ currentLine+":"+outputIndex);
+        identify(br,line);
+
+    }
+
+    public static void floatLiteral(BufferedReader br, String line, int cond , int outputIndex) throws IOException {
+        char ch;
+
+        ch = readNextCh(line);
+        if (cond == 0){
+            if (!decCond(ch)){
+                System.out.println(ch+" a Unexpected Token at "+currentLine+":"+outputIndex);
+                System.exit(0);
+            }
+            while (decCond(ch)){
+                ch = readNextCh(line);
+                if (ch == 'e' || ch == 'E'){
+                    floatLiteral(br,line,1, outputIndex);
+                    return;
+                }
+                if (bracketCond(ch) || ch ==' '){
+                    break;
+                }
+
+                if (!decCond(ch) && ch!='#'){
+                    System.out.println(ch + " b Unexpected Token at "+currentLine+":"+outputIndex);
+                    System.exit(0);
+                }
+            }
+
+
+
+        } else if (cond == 1){
+            if (ch != '+' && ch != '-' && !decCond(ch)){
+                System.out.println(ch + " c Unexpected Token at "+currentLine+":"+outputIndex);
+                System.exit(0);
+            }
+
+            ch = readNextCh(line);
+            while (decCond(ch)){
+                ch = readNextCh(line);
+                if (bracketCond(ch) || ch ==' '){
+                    break;
+                }
+
+                if (!decCond(ch)&& ch!='#'){
+                    System.out.println(ch + " d Unexpected Token at "+currentLine+":"+outputIndex);
+                    System.exit(0);
+                }
+            }
+
+        }
+
+        System.out.println("NUMBER "+ currentLine+":"+outputIndex);
+        identify(br,line);
+
+
+    }
+
+    public static boolean hexCond(char ch){
+        return ((ch >= 'a' && ch <= 'f') || (ch>= 'A' && ch <= 'F') || (ch >= '0' && ch <= '9'));
+    }
+
+    public static boolean binCond(char ch){
+        return ((ch >= '0' && ch <= '1'));
+    }
+
+    public static boolean decCond(char ch){
+        return ((ch >= '0' && ch <= '9'));
+    }
+
+    public static boolean bracketCond(char ch){
+        return (ch == '(' || ch == ')' || ch == '['|| ch == ']'|| ch == '{'|| ch == '}');
     }
 
 }
