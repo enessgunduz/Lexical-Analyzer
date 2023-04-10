@@ -113,8 +113,11 @@ public class Main {
                 || (ch == ':') || (ch == '<')
                 || (ch == '=') || (ch == '>')
                 || (ch == '?')) {
-            System.out.println("ch -> " + ch);
-            System.exit(0);
+            if (ch == '?') {
+                System.out.println("ch -> " + ch);
+
+            }
+            // System.exit(0);
             wordLiteral(br, line);
         } /*
            * if ((ch == '!') || (ch == '*') || (ch == '/') || (ch == ':') || (ch == '<')
@@ -142,16 +145,16 @@ public class Main {
         while (line.charAt(currentIndex) != ' ') {
 
             char ch = readNextCh(line);
-            if (ch == ' ') {
-                word += ch;
-                // System.out.println(word);
-            }
             /*
-             * if (!((ch >= 97 && ch <= 122) || (ch >= 65 && ch <= 90))) {
-             * break;
+             * if (ch == ' ') {
+             * 
              * }
              */
 
+            if (!((ch >= 97 && ch <= 122) || (ch >= 65 && ch <= 90))) {
+                break;
+            }
+            word += ch;
         }
 
         if (word.equals("true") || word.equals("false")) {
