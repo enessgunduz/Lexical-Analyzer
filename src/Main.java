@@ -290,15 +290,18 @@ public class Main {
                     floatLiteral(br, line, 0, outputIndex);
                     return;
                 }
-                if (bracketCond(ch) || ch == ' ') {
+                if (bracketCond(ch) || ch == ' ' || ch == '#') {
                     break;
                 }
 
                 if (!decCond(ch)) {
+
                     promtError(currentLine, outputIndex);
                 }
             }
-        } else {
+        } else if (bracketCond(ch) || ch == '#'){
+
+        }else {
             promtError(currentLine, outputIndex);
         }
 
