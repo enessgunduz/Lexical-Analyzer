@@ -39,9 +39,9 @@ public class Main {
      * This function stands for reading next character. It also increments
      * currentIndex.
      */
-    public static char readNextCh(String line)  {
+    public static char readNextCh(String line) {
         currentIndex++;
-        if (line.length() < currentIndex+1) {
+        if (line.length() < currentIndex + 1) {
             return '#';
         }
         return line.charAt(currentIndex);
@@ -88,12 +88,12 @@ public class Main {
         }
 
         // Comment Control
-        if(ch == '~'){
+        if (ch == '~') {
             line = readLn(br);
         }
 
         // Space Control
-        if (ch == ' '){
+        if (ch == ' ') {
             ++currentIndex;
         }
 
@@ -103,12 +103,18 @@ public class Main {
         if (ch == '-' || ch == '+' || (ch >= '0' && ch <= '9') || ch == '.')
             numberLiterals(br, line);
 
-
         if (ch == '\'')
-            charLiteral(br,line);
+            charLiteral(br, line);
 
-        if (ch == '"'){
+        if (ch == '"') {
             stringLiteral(br, line);
+        }
+        if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A')) {
+            wordLiteral(br, line);
+        }
+        if ((ch == '!') || (ch == '*') || (ch == '/') || (ch == ':') || (ch == '<') || (ch == '=') || (ch == '>')
+                || (ch == '?')) {
+            identifierLiteral(br, line, currentIndex + 1);
         }
 
         // All cases must be checked here.
@@ -119,90 +125,134 @@ public class Main {
         identify(br, line);
     }
 
+    public static void wordLiteral(BufferedReader br, String line) throws IOException {
+        int outputIndex = currentIndex + 1;
+
+        String word = "";
+        word += line.charAt(currentIndex);
+
+        while (line.charAt(currentIndex) != ' ') {
+
+            char ch = readNextCh(line);
+
+            if ((ch == '.') || (ch == '+') || (ch == '-') || (ch >= '0' && ch <= '9')) {
+                System.out.println("İDENTİFİERİDENTİFİER");
+                identifierLiteral(br, line, outputIndex);
+                break;
+            }
+
+            if (!((ch >= 97 && ch <= 122) || (ch >= 65 && ch <= 90))) {
+                break;
+            }
+
+            word += ch;
+            // System.out.println(word);
+
+        }
+        if (word.equals("true") || word.equals("false")) {
+            booleanLiteral(br, line, outputIndex);
+        }
+        if (word.equals("define") || word.equals("let") || word.equals("cond")
+                || word.equals("if") || word.equals("begin")) {
+            keywordLiteral(br, line, word, outputIndex);
+        } else {
+            identifierLiteral(br, line, outputIndex);
+        }
+    }
+
+    public static void booleanLiteral(BufferedReader br, String line, int outputIndex) {
+        System.out.println("BOOLEAN " + currentLine + ":" + outputIndex);
+    }
+
+    public static void identifierLiteral(BufferedReader br, String line, int outputIndex) {
+        System.out.println("IDENTIFIER " + currentLine + ":" + outputIndex);
+    }
+
+    public static void keywordLiteral(BufferedReader br, String line, String keyword, int outputIndex) {
+        System.out.println(keyword.toUpperCase() + " " + currentLine + ":" + outputIndex);
+    }
 
     public static void charLiteral(BufferedReader br, String line) throws IOException {
-        int outputIndex = currentIndex+1; //for output purposes
+        int outputIndex = currentIndex + 1; // for output purposes
         char ch = readNextCh(line);
 
-        if (ch == '\''){
-            promtError(currentLine,outputIndex);
-        }
-        else if (ch == '\\'){
+        if (ch == '\'') {
+            promtError(currentLine, outputIndex);
+        } else if (ch == '\\') {
             ch = readNextCh(line);
-            if (ch != '\''){
-                promtError(currentLine,outputIndex);
-            }else {
+            if (ch != '\'') {
+                promtError(currentLine, outputIndex);
+            } else {
                 ch = readNextCh(line);
-                if (ch != '\''){
-                    promtError(currentLine,outputIndex);
+                if (ch != '\'') {
+                    promtError(currentLine, outputIndex);
                 }
             }
 
         } else if (!(ch >= 32 && ch <= 126)) {
-            promtError(currentLine,outputIndex);
+            promtError(currentLine, outputIndex);
         } else {
             ch = readNextCh(line);
-            if (ch != '\''){
-                promtError(currentLine,outputIndex);
+            if (ch != '\'') {
+                promtError(currentLine, outputIndex);
             }
 
         }
-        System.out.println("CHAR "+ currentLine+":"+outputIndex);
+        System.out.println("CHAR " + currentLine + ":" + outputIndex);
         readNextCh(line);
-        identify(br,line);
-
+        identify(br, line);
 
     }
 
     public static void stringLiteral(BufferedReader br, String line) throws IOException {
-        int outputIndex = currentIndex+1; //for output purposes
+        int outputIndex = currentIndex + 1; // for output purposes
         char chOld = line.charAt(currentIndex);
         char ch = readNextCh(line);
-        if (!(ch >= 32 && ch <= 126)){
-            promtError(currentLine,outputIndex);
+        if (!(ch >= 32 && ch <= 126)) {
+            promtError(currentLine, outputIndex);
         }
-        if (ch == '"'){
+        if (ch == '"') {
 
         }
 
-        while (ch >= 32 && ch <= 126){
+        while (ch >= 32 && ch <= 126) {
             chOld = ch;
             ch = readNextCh(line);
-            if (ch == '"' && chOld != '\\'){
+            if (ch == '"' && chOld != '\\') {
                 break;
             }
 
             if (!(ch >= 32 && ch <= 126) || ch == '#')
-                promtError(currentLine,outputIndex);
+                promtError(currentLine, outputIndex);
         }
 
-        System.out.println("STRING "+ currentLine+":"+outputIndex);
+        System.out.println("STRING " + currentLine + ":" + outputIndex);
         readNextCh(line);
-        identify(br,line);
+        identify(br, line);
 
     }
 
     public static void numberLiterals(BufferedReader br, String line) throws IOException {
         char ch = line.charAt(currentIndex);
-        int outputIndex = currentIndex+1; //for output purposes
+        int outputIndex = currentIndex + 1; // for output purposes
 
-        boolean hexOrBin = false ,hex = false, bin = false;
+        boolean hexOrBin = false, hex = false, bin = false;
 
-        if (ch == '.'){
-            floatLiteral(br,line,0, outputIndex);
+        if (ch == '.') {
+            floatLiteral(br, line, 0, outputIndex);
             return;
-        } else if (ch == '0'){ //Could be hex or bin
-            hexOrBin=true;
+        } else if (ch == '0') { // Could be hex or bin
+            hexOrBin = true;
         }
 
         ch = readNextCh(line);
-        if (ch == '.'){
-            floatLiteral(br,line,0, outputIndex);
+        if (ch == '.') {
+            floatLiteral(br, line, 0, outputIndex);
             return;
         }
 
-        /*Bin or hex works*/
-        if (hexOrBin && (ch == 'x' || ch =='b')){
+        /* Bin or hex works */
+        if (hexOrBin && (ch == 'x' || ch == 'b')) {
             if (ch == 'x')
                 hex = true;
             else
@@ -210,122 +260,118 @@ public class Main {
 
             ch = readNextCh(line);
 
-            while (hex && hexCond(ch)){
+            while (hex && hexCond(ch)) {
                 ch = readNextCh(line);
-                if (bracketCond(ch) || ch ==' '){
+                if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
-                if (!hexCond(ch) && ch!='#'){
+                if (!hexCond(ch) && ch != '#') {
 
-                    promtError(currentLine,outputIndex);
+                    promtError(currentLine, outputIndex);
                 }
             }
-            while (bin && binCond(ch)){
+            while (bin && binCond(ch)) {
                 ch = readNextCh(line);
-                if (bracketCond(ch)|| ch ==' '){
+                if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
-                if (!binCond(ch)&& ch!='#'){
-                    promtError(currentLine,outputIndex);
+                if (!binCond(ch) && ch != '#') {
+                    promtError(currentLine, outputIndex);
                 }
             }
-        } else if (decCond(ch)){
-            /*simple number literals*/
-            while (true){
+        } else if (decCond(ch)) {
+            /* simple number literals */
+            while (true) {
                 ch = readNextCh(line);
-                if (ch == 'e' || ch == 'E'){
+                if (ch == 'e' || ch == 'E') {
                     floatLiteral(br, line, 1, outputIndex);
                     return;
-                } else if (ch == '.'){
+                } else if (ch == '.') {
                     floatLiteral(br, line, 0, outputIndex);
                     return;
                 }
-                if (bracketCond(ch) || ch ==' '){
+                if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
 
-                if (!decCond(ch)){
-                    promtError(currentLine,outputIndex);
+                if (!decCond(ch)) {
+                    promtError(currentLine, outputIndex);
                 }
             }
         } else {
-            promtError(currentLine,outputIndex);
+            promtError(currentLine, outputIndex);
         }
 
-
-        System.out.println("NUMBER "+ currentLine+":"+outputIndex);
-        identify(br,line);
+        System.out.println("NUMBER " + currentLine + ":" + outputIndex);
+        identify(br, line);
 
     }
 
-    public static void floatLiteral(BufferedReader br, String line, int cond , int outputIndex) throws IOException {
+    public static void floatLiteral(BufferedReader br, String line, int cond, int outputIndex) throws IOException {
         char ch;
 
         ch = readNextCh(line);
-        if (cond == 0){
-            if (!decCond(ch)){
-                promtError(currentLine,outputIndex);
+        if (cond == 0) {
+            if (!decCond(ch)) {
+                promtError(currentLine, outputIndex);
             }
-            while (decCond(ch)){
+            while (decCond(ch)) {
                 ch = readNextCh(line);
-                if (ch == 'e' || ch == 'E'){
-                    floatLiteral(br,line,1, outputIndex);
+                if (ch == 'e' || ch == 'E') {
+                    floatLiteral(br, line, 1, outputIndex);
                     return;
                 }
-                if (bracketCond(ch) || ch ==' '){
+                if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
 
-                if (!decCond(ch) && ch!='#'){
-                    promtError(currentLine,outputIndex);
+                if (!decCond(ch) && ch != '#') {
+                    promtError(currentLine, outputIndex);
                 }
             }
 
-
-
-        } else if (cond == 1){
-            if (ch != '+' && ch != '-' && !decCond(ch)){
-                promtError(currentLine,outputIndex);
+        } else if (cond == 1) {
+            if (ch != '+' && ch != '-' && !decCond(ch)) {
+                promtError(currentLine, outputIndex);
             }
 
             ch = readNextCh(line);
-            while (decCond(ch)){
+            while (decCond(ch)) {
                 ch = readNextCh(line);
-                if (bracketCond(ch) || ch ==' '){
+                if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
 
-                if (!decCond(ch)&& ch!='#'){
-                    promtError(currentLine,outputIndex);
+                if (!decCond(ch) && ch != '#') {
+                    promtError(currentLine, outputIndex);
                 }
             }
 
         }
 
-        System.out.println("NUMBER "+ currentLine+":"+outputIndex);
-        identify(br,line);
-
+        System.out.println("NUMBER " + currentLine + ":" + outputIndex);
+        identify(br, line);
 
     }
 
-    public static boolean hexCond(char ch){
-        return ((ch >= 'a' && ch <= 'f') || (ch>= 'A' && ch <= 'F') || (ch >= '0' && ch <= '9'));
+    public static boolean hexCond(char ch) {
+        return ((ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') || (ch >= '0' && ch <= '9'));
     }
 
-    public static boolean binCond(char ch){
+    public static boolean binCond(char ch) {
         return ((ch >= '0' && ch <= '1'));
     }
 
-    public static boolean decCond(char ch){
+    public static boolean decCond(char ch) {
         return ((ch >= '0' && ch <= '9'));
     }
 
-    public static boolean bracketCond(char ch){
-        return (ch == '(' || ch == ')' || ch == '['|| ch == ']'|| ch == '{'|| ch == '}');
+    public static boolean bracketCond(char ch) {
+        return (ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}');
     }
 
-    public static void promtError(int line, int index){
-        System.out.println("Unexpected Token at "+line+":"+index);
+    public static void promtError(int line, int index) {
+        System.out.println("Unexpected Token at " + line + ":" + index);
         System.exit(0);
     }
 
