@@ -8,8 +8,9 @@ public class Main {
     static int currentIndex = 0;
     static int currentLine = 1;
 
-    public static void main(String[] args) throws IOException {
+    static String outputText = "";
 
+    public static void main(String[] args) throws IOException {
         // read input file
         File f = new File("input.txt");
         FileReader fr = new FileReader(f);
@@ -29,8 +30,10 @@ public class Main {
         currentIndex = 0;
         String line = br.readLine();
         if (line == null) {
-            System.out.println("End Of File");
             return null;
+        }
+        if (line.length() == 0){
+            return readLn(br);
         }
         return line;
     }
@@ -57,67 +60,46 @@ public class Main {
         // if current line finished, go to next line. If it is null, then return
         if (line.length() < currentIndex + 1) {
             line = readLn(br);
-            if (line == null)
+            if (line == null){
+                System.out.println(outputText);
                 System.exit(0);
+            }
         }
 
         // Because we want to get the current char, we didn't call readNextCh. But in
         // other cases, we should use.
         char ch = line.charAt(currentIndex);
 
+
         // Bracket Control
-        switch (ch) {
-            case '(':
-                System.out.println("LEFTPAR " + currentLine + ":" + ++currentIndex);
-                break;
-            case ')':
-                System.out.println("RIGHTPAR " + currentLine + ":" + ++currentIndex);
-                break;
-            case '[':
-                System.out.println("LEFTSQUAREB " + currentLine + ":" + ++currentIndex);
-                break;
-            case ']':
-                System.out.println("RIGHTSQUAREB " + currentLine + ":" + ++currentIndex);
-                break;
-            case '{':
-                System.out.println("LEFTCURLYB " + currentLine + ":" + ++currentIndex);
-                break;
-            case '}':
-                System.out.println("RIGHTCURLYB " + currentLine + ":" + ++currentIndex);
-                break;
-        }
+        if (bracketCond(ch))
+            bracketLiteral(ch);
 
         // Comment Control
-        if (ch == '~') {
+        else if (ch == '~') {
             line = readLn(br);
         }
 
         // Space Control
-        if (ch == ' ') {
+        else if (ch == ' ') {
             ++currentIndex;
         }
 
-        // Check if it is a letter
-
         // Check if it is a number
-        if (ch == '-' || ch == '+' || (ch >= '0' && ch <= '9') || ch == '.')
+        else if (ch == '-' || ch == '+' || (ch >= '0' && ch <= '9') || ch == '.')
             numberLiterals(br, line);
 
-        if (ch == '\'')
+        else if (ch == '\'')
             charLiteral(br, line);
 
-        if (ch == '"') {
+        else if (ch == '"') {
             stringLiteral(br, line);
         }
-        if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A') || (ch == '!') || (ch == '*') || (ch == '/')
+        else if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A') || (ch == '!') || (ch == '*') || (ch == '/')
                 || (ch == ':') || (ch == '<')
                 || (ch == '=') || (ch == '>')
                 || (ch == '?')) {
-            if (ch == '?') {
-                System.out.println("ch -> " + ch);
 
-            }
-            // System.exit(0);
             wordLiteral(br, line);
         } /*
            * if ((ch == '!') || (ch == '*') || (ch == '/') || (ch == ':') || (ch == '<')
@@ -159,6 +141,7 @@ public class Main {
 
         if (word.equals("true") || word.equals("false")) {
             booleanLiteral(br, line, outputIndex);
+            return;
         }
         if (word.equals("define") || word.equals("let") || word.equals("cond")
                 || word.equals("if") || word.equals("begin")) {
@@ -170,17 +153,16 @@ public class Main {
     }
 
     public static void booleanLiteral(BufferedReader br, String line, int outputIndex) {
-        System.out.println("BOOLEAN " + currentLine + ":" + outputIndex);
+        outputText += "BOOLEAN " + currentLine + ":" + outputIndex + "\n";
     }
 
     public static void identifierLiteral(BufferedReader br, String line, int outputIndex) {
-
-        System.out.println("IDENTIFIER " + currentLine + ":" + outputIndex);
+        outputText += "IDENTIFIER " + currentLine + ":" + outputIndex + "\n";
 
     }
 
     public static void keywordLiteral(BufferedReader br, String line, String keyword, int outputIndex) {
-        System.out.println(keyword.toUpperCase() + " " + currentLine + ":" + outputIndex);
+        outputText += keyword.toUpperCase() + " " + currentLine + ":" + outputIndex + "\n";
     }
 
     public static void charLiteral(BufferedReader br, String line) throws IOException {
@@ -188,30 +170,29 @@ public class Main {
         char ch = readNextCh(line);
 
         if (ch == '\'') {
-            promtError(currentLine, outputIndex);
+            promtError(currentLine, outputIndex, line);
         } else if (ch == '\\') {
             ch = readNextCh(line);
             if (ch != '\'') {
-                promtError(currentLine, outputIndex);
+                promtError(currentLine, outputIndex, line);
             } else {
                 ch = readNextCh(line);
                 if (ch != '\'') {
-                    promtError(currentLine, outputIndex);
+                    promtError(currentLine, outputIndex, line);
                 }
             }
 
         } else if (!(ch >= 32 && ch <= 126)) {
-            promtError(currentLine, outputIndex);
+            promtError(currentLine, outputIndex, line);
         } else {
             ch = readNextCh(line);
             if (ch != '\'') {
-                promtError(currentLine, outputIndex);
+                promtError(currentLine, outputIndex, line);
             }
 
         }
-        System.out.println("CHAR " + currentLine + ":" + outputIndex);
+        outputText += "CHAR " + currentLine + ":" + outputIndex + "\n";
         readNextCh(line);
-        identify(br, line);
 
     }
 
@@ -220,7 +201,7 @@ public class Main {
         char chOld = line.charAt(currentIndex);
         char ch = readNextCh(line);
         if (!(ch >= 32 && ch <= 126)) {
-            promtError(currentLine, outputIndex);
+            promtError(currentLine, outputIndex, line);
         }
         if (ch == '"') {
 
@@ -234,12 +215,11 @@ public class Main {
             }
 
             if (!(ch >= 32 && ch <= 126) || ch == '#')
-                promtError(currentLine, outputIndex);
+                promtError(currentLine, outputIndex, line);
         }
 
-        System.out.println("STRING " + currentLine + ":" + outputIndex);
+        outputText += "STRING " + currentLine + ":" + outputIndex + "\n";
         readNextCh(line);
-        identify(br, line);
 
     }
 
@@ -248,6 +228,12 @@ public class Main {
         int outputIndex = currentIndex + 1; // for output purposes
 
         boolean hexOrBin = false, hex = false, bin = false;
+
+        if ((ch == '.' || ch == '+' || ch == '-' ) && (currentIndex+1==line.length() ||line.charAt(currentIndex+1)==' ')){
+            currentIndex++;
+            identifierLiteral(br,line,outputIndex);
+            return;
+        }
 
         if (ch == '.') {
             floatLiteral(br, line, 0, outputIndex);
@@ -278,7 +264,7 @@ public class Main {
                 }
                 if (!hexCond(ch) && ch != '#') {
 
-                    promtError(currentLine, outputIndex);
+                    promtError(currentLine, outputIndex, line);
                 }
             }
             while (bin && binCond(ch)) {
@@ -287,7 +273,7 @@ public class Main {
                     break;
                 }
                 if (!binCond(ch) && ch != '#') {
-                    promtError(currentLine, outputIndex);
+                    promtError(currentLine, outputIndex, line);
                 }
             }
         } else if (decCond(ch)) {
@@ -306,18 +292,16 @@ public class Main {
                 }
 
                 if (!decCond(ch)) {
-
-                    promtError(currentLine, outputIndex);
+                    promtError(currentLine, outputIndex, line);
                 }
             }
         } else if (bracketCond(ch) || ch == '#') {
 
         } else {
-            promtError(currentLine, outputIndex);
+            promtError(currentLine, outputIndex, line);
         }
 
-        System.out.println("NUMBER " + currentLine + ":" + outputIndex);
-        identify(br, line);
+        outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
 
     }
 
@@ -327,7 +311,7 @@ public class Main {
         ch = readNextCh(line);
         if (cond == 0) {
             if (!decCond(ch)) {
-                promtError(currentLine, outputIndex);
+                promtError(currentLine, outputIndex, line);
             }
             while (decCond(ch)) {
                 ch = readNextCh(line);
@@ -340,13 +324,13 @@ public class Main {
                 }
 
                 if (!decCond(ch) && ch != '#') {
-                    promtError(currentLine, outputIndex);
+                    promtError(currentLine, outputIndex, line);
                 }
             }
 
         } else if (cond == 1) {
             if (ch != '+' && ch != '-' && !decCond(ch)) {
-                promtError(currentLine, outputIndex);
+                promtError(currentLine, outputIndex, line);
             }
 
             ch = readNextCh(line);
@@ -357,15 +341,38 @@ public class Main {
                 }
 
                 if (!decCond(ch) && ch != '#') {
-                    promtError(currentLine, outputIndex);
+                    promtError(currentLine, outputIndex, line);
                 }
             }
 
         }
 
-        System.out.println("NUMBER " + currentLine + ":" + outputIndex);
-        identify(br, line);
+        outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
 
+    }
+
+    public static void bracketLiteral(char ch){
+        // Bracket Control
+        switch (ch) {
+            case '(':
+                outputText += "LEFTPAR " + currentLine + ":" + ++currentIndex + "\n";
+                break;
+            case ')':
+                outputText += "RIGHTPAR " + currentLine + ":" + ++currentIndex + "\n";
+                break;
+            case '[':
+                outputText += "LEFTSQUAREB " + currentLine + ":" + ++currentIndex + "\n";
+                break;
+            case ']':
+                outputText += "RIGHTSQUAREB " + currentLine + ":" + ++currentIndex + "\n";
+                break;
+            case '{':
+                outputText += "LEFTCURLYB " + currentLine + ":" + ++currentIndex + "\n";
+                break;
+            case '}':
+                outputText += "RIGHTCURLYB " + currentLine + ":" + ++currentIndex + "\n";
+                break;
+        }
     }
 
     public static boolean hexCond(char ch) {
@@ -384,8 +391,16 @@ public class Main {
         return (ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}');
     }
 
-    public static void promtError(int line, int index) {
-        System.out.println("Unexpected Token at " + line + ":" + index);
+    public static void promtError(int line, int index, String lineText) {
+        String errorText = "";
+        currentIndex = index-1;
+        char ch = lineText.charAt(currentIndex);
+        while (ch != ' ' && ch != '#'){
+            errorText += ch;
+            ch = readNextCh(lineText);
+        }
+
+        System.out.println("LEXICAL ERROR [" + line + ":" + index + "]: Invalid token '"+errorText+"'");
         System.exit(0);
     }
 
