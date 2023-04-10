@@ -5,10 +5,9 @@
 }
 0b101110
 true fdfd
-define let
+define let ? let
 cond
 efe5
-+
--
-45 ? 54
+45  54
 54
+xd

@@ -1,7 +1,13 @@
-(define (fibonacci n)
-  (let fib ([prev 0]
-[cur 1]
-            [i 0])
-    (if (= i n)
-        cur
-        (fib cur (+ prev cur) (+ i 1)))))
+'a' '@' 's' '\'' 'a'"jasflajflka"(+25)(+56246 -235235{)
++15346346 124124 0x1242f
+1.2553 2.43E23 .43e+22() 0x1221
+~asdasdasf
+}
+0b101110
+true fdfd
+define let ? let
+cond
+efe5
+45  54
+54
+xd

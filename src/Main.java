@@ -109,20 +109,28 @@ public class Main {
         if (ch == '"') {
             stringLiteral(br, line);
         }
-        if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A')) {
-            wordLiteral(br, line);
-        }
-        if ((ch == '!') || (ch == '*') || (ch == '/') || (ch == ':') || (ch == '<') || (ch == '=') || (ch == '>')
+        if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A') || (ch == '!') || (ch == '*') || (ch == '/')
+                || (ch == ':') || (ch == '<')
+                || (ch == '=') || (ch == '>')
                 || (ch == '?')) {
-            identifierLiteral(br, line, currentIndex + 1);
-        }
-
+            System.out.println("ch -> " + ch);
+            System.exit(0);
+            wordLiteral(br, line);
+        } /*
+           * if ((ch == '!') || (ch == '*') || (ch == '/') || (ch == ':') || (ch == '<')
+           * || (ch == '=') || (ch == '>')
+           * || (ch == 63)) {
+           * System.out.println(ch);
+           * // identifierLiteral(br, line, currentIndex);
+           * }
+           */
         // All cases must be checked here.
 
         /* YOUR FUNCTIONS MUST BE HERE! */
 
         // Recursion baby, there must be no code after this line in this function.
         identify(br, line);
+
     }
 
     public static void wordLiteral(BufferedReader br, String line) throws IOException {
@@ -134,21 +142,18 @@ public class Main {
         while (line.charAt(currentIndex) != ' ') {
 
             char ch = readNextCh(line);
-
-            if ((ch == '.') || (ch == '+') || (ch == '-') || (ch >= '0' && ch <= '9')) {
-                System.out.println("İDENTİFİERİDENTİFİER");
-                identifierLiteral(br, line, outputIndex);
-                break;
+            if (ch == ' ') {
+                word += ch;
+                // System.out.println(word);
             }
-
-            if (!((ch >= 97 && ch <= 122) || (ch >= 65 && ch <= 90))) {
-                break;
-            }
-
-            word += ch;
-            // System.out.println(word);
+            /*
+             * if (!((ch >= 97 && ch <= 122) || (ch >= 65 && ch <= 90))) {
+             * break;
+             * }
+             */
 
         }
+
         if (word.equals("true") || word.equals("false")) {
             booleanLiteral(br, line, outputIndex);
         }
@@ -158,6 +163,7 @@ public class Main {
         } else {
             identifierLiteral(br, line, outputIndex);
         }
+
     }
 
     public static void booleanLiteral(BufferedReader br, String line, int outputIndex) {
@@ -165,7 +171,9 @@ public class Main {
     }
 
     public static void identifierLiteral(BufferedReader br, String line, int outputIndex) {
+
         System.out.println("IDENTIFIER " + currentLine + ":" + outputIndex);
+
     }
 
     public static void keywordLiteral(BufferedReader br, String line, String keyword, int outputIndex) {
@@ -299,9 +307,9 @@ public class Main {
                     promtError(currentLine, outputIndex);
                 }
             }
-        } else if (bracketCond(ch) || ch == '#'){
+        } else if (bracketCond(ch) || ch == '#') {
 
-        }else {
+        } else {
             promtError(currentLine, outputIndex);
         }
 
