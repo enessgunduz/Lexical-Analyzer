@@ -11,8 +11,13 @@ public class Main {
     static String outputText = "";
 
     public static void main(String[] args) throws IOException {
+        System.out.print("Name of the input file:");
+        Scanner inpt = new Scanner(System.in);
+        String fileName = inpt.nextLine();
+        inpt.close();
+        System.out.println();
         // read input file
-        File f = new File("input.txt");
+        File f = new File("src/"+fileName+".txt");
         FileReader fr = new FileReader(f);
         BufferedReader br = new BufferedReader(fr);
 
@@ -62,6 +67,11 @@ public class Main {
             line = readLn(br);
             if (line == null){
                 System.out.println(outputText);
+                File myObj = new File("src/output.txt");
+                myObj.createNewFile();
+                FileWriter myWriter = new FileWriter("src/output.txt");
+                myWriter.write(outputText);
+                myWriter.close();
                 System.exit(0);
             }
         }
