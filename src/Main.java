@@ -111,14 +111,7 @@ public class Main {
                 || (ch == '?')) {
 
             wordLiteral(br, line);
-        } /*
-           * if ((ch == '!') || (ch == '*') || (ch == '/') || (ch == ':') || (ch == '<')
-           * || (ch == '=') || (ch == '>')
-           * || (ch == 63)) {
-           * System.out.println(ch);
-           * // identifierLiteral(br, line, currentIndex);
-           * }
-           */
+        }
         // All cases must be checked here.
 
         /* YOUR FUNCTIONS MUST BE HERE! */
@@ -143,7 +136,7 @@ public class Main {
              * }
              */
 
-            if (!((ch >= 97 && ch <= 122) || (ch >= 65 && ch <= 90))) {
+            if (!((ch >= 97 && ch <= 122)  || binCond(ch) || ch == '+' || ch == '-' || ch=='.')) {
                 break;
             }
             word += ch;
@@ -305,7 +298,7 @@ public class Main {
                     promtError(currentLine, outputIndex, line);
                 }
             }
-        } else if (bracketCond(ch) || ch == '#') {
+        } else if (bracketCond(ch) || ch == '#' || ch==' ') {
 
         } else {
             promtError(currentLine, outputIndex, line);
@@ -401,16 +394,22 @@ public class Main {
         return (ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}');
     }
 
-    public static void promtError(int line, int index, String lineText) {
+    public static void promtError(int line, int index, String lineText) throws IOException {
         String errorText = "";
         currentIndex = index-1;
         char ch = lineText.charAt(currentIndex);
-        while (ch != ' ' && ch != '#'){
+        while (ch != ' ' && ch != '#' && !bracketCond(ch)){
             errorText += ch;
             ch = readNextCh(lineText);
         }
+        outputText += "LEXICAL ERROR [" + line + ":" + index + "]: Invalid token '"+errorText+"'";
+        System.out.println(outputText);
 
-        System.out.println("LEXICAL ERROR [" + line + ":" + index + "]: Invalid token '"+errorText+"'");
+        File myObj = new File("src/output.txt");
+        myObj.createNewFile();
+        FileWriter myWriter = new FileWriter("src/output.txt");
+        myWriter.write(outputText);
+        myWriter.close();
         System.exit(0);
     }
 
