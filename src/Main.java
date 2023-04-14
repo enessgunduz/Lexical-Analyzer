@@ -1,3 +1,9 @@
+/* 
+Mustafa Tolga Akbaba - 150120001
+Efe Özgen - 150121077
+Muhammed Enes Gündüz - 150120038
+*/
+
 import javax.lang.model.util.ElementScanner6;
 import javax.swing.*;
 import java.io.*;
@@ -17,7 +23,7 @@ public class Main {
         inpt.close();
         System.out.println();
         // read input file
-        File f = new File("src/"+fileName+".txt");
+        File f = new File("src/" + fileName + ".txt");
         FileReader fr = new FileReader(f);
         BufferedReader br = new BufferedReader(fr);
 
@@ -37,7 +43,7 @@ public class Main {
         if (line == null) {
             return null;
         }
-        if (line.length() == 0){
+        if (line.length() == 0) {
             return readLn(br);
         }
         return line;
@@ -65,7 +71,7 @@ public class Main {
         // if current line finished, go to next line. If it is null, then return
         if (line.length() < currentIndex + 1) {
             line = readLn(br);
-            if (line == null){
+            if (line == null) {
                 System.out.println(outputText);
                 File myObj = new File("src/output.txt");
                 myObj.createNewFile();
@@ -79,7 +85,6 @@ public class Main {
         // Because we want to get the current char, we didn't call readNextCh. But in
         // other cases, we should use.
         char ch = line.charAt(currentIndex);
-
 
         // Bracket Control
         if (bracketCond(ch))
@@ -104,8 +109,8 @@ public class Main {
 
         else if (ch == '"') {
             stringLiteral(br, line);
-        }
-        else if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A') || (ch == '!') || (ch == '*') || (ch == '/')
+
+        } else if ((ch <= 'z' && ch >= 'a') || (ch <= 'Z' && ch >= 'A') || (ch == '!') || (ch == '*') || (ch == '/')
                 || (ch == ':') || (ch == '<')
                 || (ch == '=') || (ch == '>')
                 || (ch == '?')) {
@@ -130,11 +135,6 @@ public class Main {
         while (line.charAt(currentIndex) != ' ') {
 
             char ch = readNextCh(line);
-            /*
-             * if (ch == ' ') {
-             * 
-             * }
-             */
 
             if (!((ch >= 97 && ch <= 122)  || binCond(ch) || ch == '+' || ch == '-' || ch=='.')) {
                 break;
@@ -232,9 +232,10 @@ public class Main {
 
         boolean hexOrBin = false, hex = false, bin = false;
 
-        if ((ch == '.' || ch == '+' || ch == '-' ) && (currentIndex+1==line.length() ||line.charAt(currentIndex+1)==' ')){
+        if ((ch == '.' || ch == '+' || ch == '-')
+                && (currentIndex + 1 == line.length() || line.charAt(currentIndex + 1) == ' ')) {
             currentIndex++;
-            identifierLiteral(br,line,outputIndex);
+            identifierLiteral(br, line, outputIndex);
             return;
         }
 
@@ -259,7 +260,6 @@ public class Main {
                 bin = true;
 
             ch = readNextCh(line);
-
             while (hex && hexCond(ch)) {
                 ch = readNextCh(line);
                 if (bracketCond(ch) || ch == ' ') {
@@ -305,7 +305,6 @@ public class Main {
         }
 
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
-
     }
 
     public static void floatLiteral(BufferedReader br, String line, int cond, int outputIndex) throws IOException {
@@ -354,7 +353,7 @@ public class Main {
 
     }
 
-    public static void bracketLiteral(char ch){
+    public static void bracketLiteral(char ch) {
         // Bracket Control
         switch (ch) {
             case '(':
@@ -396,9 +395,10 @@ public class Main {
 
     public static void promtError(int line, int index, String lineText) throws IOException {
         String errorText = "";
-        currentIndex = index-1;
+        currentIndex = index - 1;
         char ch = lineText.charAt(currentIndex);
         while (ch != ' ' && ch != '#' && !bracketCond(ch)){
+
             errorText += ch;
             ch = readNextCh(lineText);
         }
