@@ -397,7 +397,7 @@ public class Main {
         String errorText = "";
         currentIndex = index - 1;
         char ch = lineText.charAt(currentIndex);
-        while (ch != ' ' && ch != '#' && !bracketCond(ch)){
+        while (ch != ' ' && ch != '#'){
 
             errorText += ch;
             ch = readNextCh(lineText);
