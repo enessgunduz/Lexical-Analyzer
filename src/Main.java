@@ -15,6 +15,7 @@ public class Main {
     static int currentLine = 1;
 
     static String outputText = "";
+    static ArrayList<String> lexs = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         System.out.print("Name of the input file:");
@@ -72,12 +73,13 @@ public class Main {
         if (line.length() < currentIndex + 1) {
             line = readLn(br);
             if (line == null) {
-                System.out.println(outputText);
+                //System.out.println(outputText);
                 File myObj = new File("src/output.txt");
                 myObj.createNewFile();
                 FileWriter myWriter = new FileWriter("src/output.txt");
                 myWriter.write(outputText);
                 myWriter.close();
+                Parser.StartParse(lexs);
                 System.exit(0);
             }
         }
@@ -119,10 +121,13 @@ public class Main {
         }
         // All cases must be checked here.
 
+
+
         /* YOUR FUNCTIONS MUST BE HERE! */
 
         // Recursion baby, there must be no code after this line in this function.
         identify(br, line);
+
 
     }
 
@@ -157,15 +162,18 @@ public class Main {
 
     public static void booleanLiteral(BufferedReader br, String line, int outputIndex) {
         outputText += "BOOLEAN " + currentLine + ":" + outputIndex + "\n";
+        lexs.add("BOOLEAN");
     }
 
     public static void identifierLiteral(BufferedReader br, String line, int outputIndex) {
         outputText += "IDENTIFIER " + currentLine + ":" + outputIndex + "\n";
+        lexs.add("IDENTIFIER");
 
     }
 
     public static void keywordLiteral(BufferedReader br, String line, String keyword, int outputIndex) {
         outputText += keyword.toUpperCase() + " " + currentLine + ":" + outputIndex + "\n";
+        lexs.add(keyword.toUpperCase());
     }
 
     public static void charLiteral(BufferedReader br, String line) throws IOException {
@@ -195,6 +203,7 @@ public class Main {
 
         }
         outputText += "CHAR " + currentLine + ":" + outputIndex + "\n";
+        lexs.add("CHAR");
         readNextCh(line);
 
     }
@@ -222,6 +231,7 @@ public class Main {
         }
 
         outputText += "STRING " + currentLine + ":" + outputIndex + "\n";
+        lexs.add("STRING");
         readNextCh(line);
 
     }
@@ -304,6 +314,7 @@ public class Main {
             promtError(currentLine, outputIndex, line);
         }
 
+        lexs.add("NUMBER");
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
     }
 
@@ -350,6 +361,7 @@ public class Main {
         }
 
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
+        lexs.add("NUMBER");
 
     }
 
@@ -358,9 +370,11 @@ public class Main {
         switch (ch) {
             case '(':
                 outputText += "LEFTPAR " + currentLine + ":" + ++currentIndex + "\n";
+                lexs.add("LEFTPAR");
                 break;
             case ')':
                 outputText += "RIGHTPAR " + currentLine + ":" + ++currentIndex + "\n";
+                lexs.add("RIGHTPAR");
                 break;
             case '[':
                 outputText += "LEFTSQUAREB " + currentLine + ":" + ++currentIndex + "\n";
