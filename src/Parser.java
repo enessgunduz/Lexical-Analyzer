@@ -3,17 +3,24 @@ import java.util.ArrayList;
 public class Parser {
 
     static ArrayList<String> lexList = new ArrayList<>();
+    static ArrayList<String> keyList = new ArrayList<>();
+
     static int currentIndex = 0;
+    static int currentIndexForKey = 0;
+
+    static int tabs = 0;
     static String currentLex;
 
-    public static void StartParse(ArrayList<String> lexs) {
+    public static void StartParse(ArrayList<String> lexs, ArrayList<String> keys) {
         lexList = lexs;
+        keyList = keys;
         Program();
     }
 
     // Enes Part Start
     static void Program() {
-        announceSyn("Program");
+        announceSyn("<Program>");
+        tabs++;
 
         setCurrentLex();
 
@@ -21,58 +28,80 @@ public class Parser {
             TopLevelForm();
             Program();
         } else {
-            return;
+            printLex(1);
         }
+
+        tabs--;
     }
 
     static void TopLevelForm() {
-        announceSyn("TopLevelForm");
+        announceSyn("<TopLevelForm>");
+        tabs++;
+        printLex(0);
 
         SecondLevelForm();
 
         if (!((lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")))) {
             error();
         }
+        printLex(0);
+
+        tabs--;
     }
 
     static void SecondLevelForm() {
-        announceSyn("SecondLevelForm");
+        announceSyn("<SecondLevelForm>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
+            printLex(0);
             FunCall();
             if (!((lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")))) {
                 error();
             }
+            printLex(0);
         } else {
             Definition();
         }
+
+        tabs--;
     }
 
     static void Definition() {
-        announceSyn("Definition");
+        announceSyn("<Definition>");
+        tabs++;
 
-        if (lexEqual("DEFINE") || lexEqual("DEFİNE"))
+        if (lexEqual("DEFINE") || lexEqual("DEFİNE")) {
+            printLex(0);
             DefinitionRight();
+        }
         else
             error();
 
+        tabs--;
     }
 
     static void DefinitionRight() {
-        announceSyn("DefinitionRight");
+        announceSyn("<DefinitionRight>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+            printLex(0);
             Expression();
         } else if (lexEqual("LEFTPAR")) {
+            printLex(0);
             setCurrentLex();
             if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+                printLex(0);
                 ArgList();
-                if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))
+                if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                    printLex(0);
                     Statements();
+                }
                 else
                     error();
             } else
@@ -80,20 +109,28 @@ public class Parser {
         } else
             error();
 
+        tabs--;
     }
 
     static void ArgList() {
-        announceSyn("ArgList");
+        announceSyn("<ArgList>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+            printLex(0);
             ArgList();
+        } else {
+            printLex(1);
         }
+
+        tabs--;
     }
 
     static void Statements() {
-        announceSyn("Statements");
+        announceSyn("<Statements>");
+        tabs++;
 
         setCurrentLex();
 
@@ -103,13 +140,16 @@ public class Parser {
         } else {
             Expression();
         }
+
+        tabs--;
     }
 
     // Enes Part End
 
     // Efe Part Start
     static void Expressions() {
-        announceSyn("Expressions");
+        announceSyn("<Expressions>");
+        tabs++;
 
         setCurrentLex();
 
@@ -118,15 +158,18 @@ public class Parser {
             Expression();
             Expressions();
         } else {
-            return;
+            printLex(1);
         }
 
+        tabs--;
     }
 
     static void Expression() {
-        announceSyn("Expression");
+        announceSyn("<Expression>");
+        tabs++;
 
         if (lexEqual("LEFTPAR")) {
+            printLex(0);
             Expr();
 
             setCurrentLex();
@@ -134,15 +177,20 @@ public class Parser {
             if (!(lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR"))) {
                 error();
             }
+            printLex(0);
         } else if (!(lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
                 || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN"))) {
             error();
+        } else {
+            printLex(0);
         }
 
+        tabs--;
     }
 
     static void Expr() {
-        announceSyn("Expr");
+        announceSyn("<Expr>");
+        tabs++;
 
         setCurrentLex();
 
@@ -160,35 +208,45 @@ public class Parser {
             error();
         }
 
+        tabs--;
     }
 
     static void FunCall() {
-        announceSyn("FunCall");
+        announceSyn("<FunCall>");
+        tabs++;
 
         if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+            printLex(0);
             Expressions();
         } else {
             error();
         }
 
+        tabs--;
     }
 
     static void LetExpression() {
-        announceSyn("LetExpression");
+        announceSyn("<LetExpression>");
+        tabs++;
 
         if (lexEqual("LET")) {
+            printLex(0);
             LetExpr();
         } else {
             error();
         }
+
+        tabs--;
     }
 
     static void LetExpr() {
-        announceSyn("LetExpr");
+        announceSyn("<LetExpr>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
+            printLex(0);
 
             setCurrentLex();
 
@@ -199,36 +257,45 @@ public class Parser {
             setCurrentLex();
 
             if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                printLex(0);
                 Statements();
             } else {
                 error();
             }
         } else if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+            printLex(0);
             setCurrentLex();
 
             if (lexEqual("LEFTPAR")) {
+                printLex(0);
                 VarDefs();
 
                 setCurrentLex();
                 if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                    printLex(0);
                     Statements();
                 } else {
                     error();
                 }
             }
         }
+
+        tabs--;
     }
 
     static void VarDefs() {
-        announceSyn("VarDefs");
+        announceSyn("<VarDefs>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
+            printLex(0);
 
             setCurrentLex();
 
             if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+                printLex(0);
                 setCurrentLex();
 
                 Expression();
@@ -236,6 +303,7 @@ public class Parser {
                 setCurrentLex();
 
                 if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                    printLex(0);
                     VarDef();
                 } else {
                     error();
@@ -243,56 +311,71 @@ public class Parser {
             }
         }
 
+        tabs--;
+
     }
 
     // Efe Part End
 
     // Tolga Part Start
     static void VarDef() {
-        announceSyn("VarDef");
+        announceSyn("<VarDef>");
+        tabs++;
 
         if ( lexList.get(currentIndex).equals("LEFTPAR") ) {
 
             VarDefs();
+        } else {
+            printLex(1);
         }
 
+        tabs--;
     }
 
     static void CondExpression() {
-        announceSyn("CondExpression");
+        announceSyn("<CondExpression>");
+        tabs++;
 
         if (lexEqual("COND")) {
+            printLex(0);
             CondBranches();
         } else {
             error();
         }
 
+        tabs--;
     }
 
     static void CondBranches() {
-        announceSyn("CondBranches");
+        announceSyn("<CondBranches>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
+            printLex(0);
             Expression();
             Statements();
 
             setCurrentLex();
 
             if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                printLex(0);
                 CondBranch();
             }
         }
 
+        tabs--;
     }
 
     static void CondBranch() {
-        announceSyn("CondBranch");
+        announceSyn("<CondBranch>");
+        tabs++;
 
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
+            printLex(0);
             Expression();
             Statements();
 
@@ -301,17 +384,20 @@ public class Parser {
             if (!(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))) {
                 error();
             }
+            printLex(0);
         } else {
-            return;
+            printLex(1);
         }
 
+        tabs--;
     }
 
     static void IfExpression() {
-        announceSyn("IfExpression");
-        
+        announceSyn("<IfExpression>");
+        tabs++;
 
         if (lexEqual("IF") || lexEqual("İF")) {
+            printLex(0);
             setCurrentLex();
             Expression();
             setCurrentLex();
@@ -321,10 +407,12 @@ public class Parser {
             error();
         }
 
+        tabs--;
     }
 
     static void EndExpression() {
-        announceSyn("EndExpression");
+        announceSyn("<EndExpression>");
+        tabs++;
 
         setCurrentLex();
 
@@ -332,20 +420,24 @@ public class Parser {
                 || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN") || lexEqual("LEFTPAR"))) {
             Expression();
         } else {
-            return;
+            printLex(1);
         }
 
+        tabs--;
     }
 
     static void BeginExpression() {
-        announceSyn("BeginExpression");
+        announceSyn("<BeginExpression>");
+        tabs++;
 
         if (lexEqual("BEGIN") || lexEqual("BEGİN")) {
+            printLex(0);
             Statements();
         } else {
             error();
         }
 
+        tabs--;
     }
 
     // Tolga Part End
@@ -355,12 +447,25 @@ public class Parser {
     }
 
     static void setCurrentLex() {
-        currentLex = lexList.get(currentIndex);
-        currentIndex++;
+        currentLex = lexList.get(currentIndex++);
     }
 
     static void announceSyn(String s) {
+        for (int i = 0; i < tabs; i++) {
+            System.out.print("      ");
+        }
         System.out.println(s);
+
+    }
+
+    static void printLex(int cond){
+        for (int i = 0; i < tabs; i++) {
+            System.out.print("      ");
+        }
+        if (cond==0)
+            System.out.println(currentLex+" ("+keyList.get(currentIndexForKey++)+")");
+        else
+            System.out.println(" ---- ");
     }
 
     static void error() {

@@ -16,6 +16,7 @@ public class Main {
 
     static String outputText = "";
     static ArrayList<String> lexs = new ArrayList<>();
+    static ArrayList<String> keys = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         System.out.print("Name of the input file:");
@@ -79,7 +80,7 @@ public class Main {
                 FileWriter myWriter = new FileWriter("src/output.txt");
                 myWriter.write(outputText);
                 myWriter.close();
-                Parser.StartParse(lexs);
+                Parser.StartParse(lexs, keys);
                 System.exit(0);
             }
         }
@@ -158,6 +159,8 @@ public class Main {
             identifierLiteral(br, line, outputIndex);
         }
 
+        keys.add(word);
+
     }
 
     public static void booleanLiteral(BufferedReader br, String line, int outputIndex) {
@@ -204,6 +207,7 @@ public class Main {
         }
         outputText += "CHAR " + currentLine + ":" + outputIndex + "\n";
         lexs.add("CHAR");
+        keys.add(String.valueOf(ch));
         readNextCh(line);
 
     }
@@ -212,6 +216,7 @@ public class Main {
         int outputIndex = currentIndex + 1; // for output purposes
         char chOld = line.charAt(currentIndex);
         char ch = readNextCh(line);
+        String s="";
         if (!(ch >= 32 && ch <= 126)) {
             promtError(currentLine, outputIndex, line);
         }
@@ -225,13 +230,14 @@ public class Main {
             if (ch == '"' && chOld != '\\') {
                 break;
             }
-
+            s += String.valueOf(ch);
             if (!(ch >= 32 && ch <= 126) || ch == '#')
                 promtError(currentLine, outputIndex, line);
         }
 
         outputText += "STRING " + currentLine + ":" + outputIndex + "\n";
         lexs.add("STRING");
+        keys.add(s);
         readNextCh(line);
 
     }
@@ -239,6 +245,7 @@ public class Main {
     public static void numberLiterals(BufferedReader br, String line) throws IOException {
         char ch = line.charAt(currentIndex);
         int outputIndex = currentIndex + 1; // for output purposes
+        String s = "";
 
         boolean hexOrBin = false, hex = false, bin = false;
 
@@ -246,6 +253,7 @@ public class Main {
                 && (currentIndex + 1 == line.length() || line.charAt(currentIndex + 1) == ' ')) {
             currentIndex++;
             identifierLiteral(br, line, outputIndex);
+            keys.add(String.valueOf(ch));
             return;
         }
 
@@ -255,7 +263,7 @@ public class Main {
         } else if (ch == '0') { // Could be hex or bin
             hexOrBin = true;
         }
-
+        s+=String.valueOf(ch);
         ch = readNextCh(line);
         if (ch == '.') {
             floatLiteral(br, line, 0, outputIndex);
@@ -275,6 +283,7 @@ public class Main {
                 if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
+                s+=String.valueOf(ch);
                 if (!hexCond(ch) && ch != '#') {
 
                     promtError(currentLine, outputIndex, line);
@@ -285,6 +294,7 @@ public class Main {
                 if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
+                s+=String.valueOf(ch);
                 if (!binCond(ch) && ch != '#') {
                     promtError(currentLine, outputIndex, line);
                 }
@@ -303,6 +313,7 @@ public class Main {
                 if (bracketCond(ch) || ch == ' ' || ch == '#') {
                     break;
                 }
+                s+=String.valueOf(ch);
 
                 if (!decCond(ch)) {
                     promtError(currentLine, outputIndex, line);
@@ -315,13 +326,15 @@ public class Main {
         }
 
         lexs.add("NUMBER");
+        keys.add(s);
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
     }
 
     public static void floatLiteral(BufferedReader br, String line, int cond, int outputIndex) throws IOException {
         char ch;
-
+        String s = "";
         ch = readNextCh(line);
+        s += String.valueOf(ch);
         if (cond == 0) {
             if (!decCond(ch)) {
                 promtError(currentLine, outputIndex, line);
@@ -335,6 +348,7 @@ public class Main {
                 if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
+                s+=String.valueOf(ch);
 
                 if (!decCond(ch) && ch != '#') {
                     promtError(currentLine, outputIndex, line);
@@ -347,11 +361,13 @@ public class Main {
             }
 
             ch = readNextCh(line);
+            s+=String.valueOf(ch);
             while (decCond(ch)) {
                 ch = readNextCh(line);
                 if (bracketCond(ch) || ch == ' ') {
                     break;
                 }
+                s+=String.valueOf(ch);
 
                 if (!decCond(ch) && ch != '#') {
                     promtError(currentLine, outputIndex, line);
@@ -362,6 +378,7 @@ public class Main {
 
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
         lexs.add("NUMBER");
+        keys.add(s);
 
     }
 
@@ -389,6 +406,8 @@ public class Main {
                 outputText += "RIGHTCURLYB " + currentLine + ":" + ++currentIndex + "\n";
                 break;
         }
+
+        keys.add(String.valueOf(ch));
     }
 
     public static boolean hexCond(char ch) {
