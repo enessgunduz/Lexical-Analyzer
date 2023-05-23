@@ -5,18 +5,19 @@ public class Parser {
     static ArrayList<String> lexList = new ArrayList<>();
     static int currentIndex = 0;
     static String currentLex;
-    public static void StartParse(ArrayList<String> lexs){
-        lexList=lexs;
+
+    public static void StartParse(ArrayList<String> lexs) {
+        lexList = lexs;
         Program();
     }
 
-    //Enes Part Start
-    static void Program(){
+    // Enes Part Start
+    static void Program() {
         announceSyn("Program");
 
         setCurrentLex();
 
-        if (lexEqual("LEFTPAR")){
+        if (lexEqual("LEFTPAR")) {
             TopLevelForm();
             Program();
         } else {
@@ -24,24 +25,24 @@ public class Parser {
         }
     }
 
-    static void TopLevelForm(){
+    static void TopLevelForm() {
         announceSyn("TopLevelForm");
 
         SecondLevelForm();
 
-        if (!lexEqual("RIGHTPAR")){
+        if ( !( (lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")) ) ) {
             error();
         }
     }
 
-    static void SecondLevelForm(){
+    static void SecondLevelForm() {
         announceSyn("SecondLevelForm");
 
         setCurrentLex();
 
-        if (lexEqual("LEFTPAR")){
+        if (lexEqual("LEFTPAR")) {
             FunCall();
-            if (!(lexEqual("RIGHTPAR"))){
+            if ( !( (lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")) ) ) {
                 error();
             }
         } else {
@@ -49,29 +50,28 @@ public class Parser {
         }
     }
 
-    static void Definition(){
+    static void Definition() {
         announceSyn("Definition");
 
-        if (lexEqual("DEFINE"))
+        if (lexEqual("DEFINE") || lexEqual("DEFİNE"))
             DefinitionRight();
         else
             error();
 
-
     }
 
-    static void DefinitionRight(){
+    static void DefinitionRight() {
         announceSyn("DefinitionRight");
 
         setCurrentLex();
 
-        if (lexEqual("IDENTIFIER")){
+        if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             Expression();
         } else if (lexEqual("LEFTPAR")) {
             setCurrentLex();
-            if (lexEqual("IDENTIFIER")){
+            if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
                 ArgList();
-                if (lexEqual("RIGHTPAR"))
+                if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))
                     Statements();
                 else
                     error();
@@ -82,22 +82,22 @@ public class Parser {
 
     }
 
-    static void ArgList(){
+    static void ArgList() {
         announceSyn("ArgList");
 
         setCurrentLex();
 
-        if (lexEqual("IDENTIFIER")){
+        if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             ArgList();
         }
     }
 
-    static void Statements(){
+    static void Statements() {
         announceSyn("Statements");
 
         setCurrentLex();
 
-        if (lexEqual("DEFINE")){
+        if (lexEqual("DEFINE") || lexEqual("DEFİNE")) {
             Definition();
             Statements();
         } else {
@@ -105,99 +105,233 @@ public class Parser {
         }
     }
 
-    //Enes Part End
+    // Enes Part End
 
-    //Efe Part Start
-    static void Expressions(){
+    // Efe Part Start
+    static void Expressions() {
         announceSyn("Expressions");
 
+        setCurrentLex();
+
+        if (lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
+                || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN") || lexEqual("LEFTPAR")) {
+                    Expression();
+                    Expressions();
+        }
+        else{
+            return;
+        }
+
     }
 
-    static void Expression(){
+    static void Expression() {
         announceSyn("Expression");
 
+
+
+        if(lexEqual("LEFTPAR")){
+            Expr();
+
+            setCurrentLex();
+
+            if( !(lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR") ) ){
+                error();
+            }
+        }
+        else if( !( lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
+        || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN") ) ){
+            error();
+        }
+        
+
     }
 
-    static void Expr(){
+    static void Expr() {
         announceSyn("Expr");
 
+        setCurrentLex();
+
+        if(lexEqual("LET")){
+            LetExpression();
+        }
+        else if(lexEqual("COND")){
+            CondExpression();
+        }
+        else if(lexEqual("IF") || lexEqual("İF")){
+            IfExpression();
+        }
+        else if(lexEqual("BEGIN") || lexEqual("BEGİN")){
+            BeginExpression();
+        }
+        else if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+            FunCall();
+        }
+        else{
+            error();
+        }
+
     }
 
-    static void FunCall(){
+    static void FunCall() {
         announceSyn("FunCall");
 
+        if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+            Expressions();
+        }
+        else{
+            error();
+        }
+        
+
     }
 
-    static void LetExpression(){
+    static void LetExpression() {
         announceSyn("LetExpression");
 
+        if(lexEqual("LET")){
+            LetExpr();
+        }
+        else{
+            error();
+        }
     }
 
-    static void LetExpr(){
+    static void LetExpr() {
         announceSyn("LetExpr");
 
+        setCurrentLex();
+
+        if(lexEqual("LEFTPAR")){
+            VarDefs();
+
+            setCurrentLex();
+
+            if(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")){
+                Statements();
+            }
+            else{
+                error();
+            }
+        }
+        else if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+            setCurrentLex();
+
+            if(lexEqual("LEFTPAR")){
+                VarDefs();
+
+                setCurrentLex();
+                if(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")){
+                    Statements();
+                }
+                else{
+                    error();
+                }
+            }
+        }
     }
 
-    static void VarDefs(){
+    static void VarDefs() {
         announceSyn("VarDefs");
 
+        setCurrentLex();
+
+        if(lexEqual("LEFTPAR")){
+            setCurrentLex();
+            
+            if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+                Expression();
+
+                setCurrentLex();
+                if(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")){
+                    VarDef();
+                }
+                else{
+                    error();
+                }
+            }
+        }
+
     }
 
-    //Efe Part End
+    // Efe Part End
 
-    //Tolga Part Start
-    static void VarDef(){
+    // Tolga Part Start
+    static void VarDef() {
         announceSyn("VarDef");
 
     }
 
-    static void CondExpression(){
+    static void CondExpression() {
         announceSyn("CondExpression");
+
+        if(lexEqual("COND")){
+            CondBranches();
+        }
+        else{
+            error();
+        }
 
     }
 
-    static void CondBranches(){
+    static void CondBranches() {
         announceSyn("CondBranches");
 
     }
 
-    static void CondBranch(){
+    static void CondBranch() {
         announceSyn("CondBranch");
 
     }
 
-    static void IfExpression(){
+    static void IfExpression() {
         announceSyn("IfExpression");
+
+        if(lexEqual("IF") || lexEqual("İF")){
+            Expression();
+            Expression();
+            EndExpression();
+        }
+        else{
+            error();
+        }
 
     }
 
-    static void EndExpression(){
+    static void EndExpression() {
         announceSyn("EndExpression");
 
     }
 
-    static void BeginExpression(){
+    static void BeginExpression() {
         announceSyn("BeginExpression");
 
+        if(lexEqual("BEGIN") || lexEqual("BEGİN")){
+            Statements();
+        }
+        else{
+            error();
+        }
+
     }
 
-    //Tolga Part End
+    // Tolga Part End
 
-    static boolean lexEqual(String word){
+    static boolean lexEqual(String word) {
         return currentLex.equals(word);
     }
-    static void setCurrentLex(){
+
+    static void setCurrentLex() {
         currentLex = lexList.get(currentIndex);
         currentIndex++;
     }
-    static void announceSyn(String s){
+
+    static void announceSyn(String s) {
         System.out.println(s);
     }
-    static void error(){
-        System.out.println("Error at :"+currentIndex+" "+currentLex);
+
+    static void error() {
+        System.out.println("Error at :" + currentIndex + " " + currentLex);
         System.exit(0);
     }
-
-
 
 }
