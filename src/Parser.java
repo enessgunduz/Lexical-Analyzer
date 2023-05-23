@@ -30,7 +30,7 @@ public class Parser {
 
         SecondLevelForm();
 
-        if ( !( (lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")) ) ) {
+        if (!((lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")))) {
             error();
         }
     }
@@ -42,7 +42,7 @@ public class Parser {
 
         if (lexEqual("LEFTPAR")) {
             FunCall();
-            if ( !( (lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")) ) ) {
+            if (!((lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")))) {
                 error();
             }
         } else {
@@ -115,10 +115,9 @@ public class Parser {
 
         if (lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
                 || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN") || lexEqual("LEFTPAR")) {
-                    Expression();
-                    Expressions();
-        }
-        else{
+            Expression();
+            Expressions();
+        } else {
             return;
         }
 
@@ -127,22 +126,18 @@ public class Parser {
     static void Expression() {
         announceSyn("Expression");
 
-
-
-        if(lexEqual("LEFTPAR")){
+        if (lexEqual("LEFTPAR")) {
             Expr();
 
             setCurrentLex();
 
-            if( !(lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR") ) ){
+            if (!(lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR"))) {
                 error();
             }
-        }
-        else if( !( lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
-        || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN") ) ){
+        } else if (!(lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
+                || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN"))) {
             error();
         }
-        
 
     }
 
@@ -151,22 +146,17 @@ public class Parser {
 
         setCurrentLex();
 
-        if(lexEqual("LET")){
+        if (lexEqual("LET")) {
             LetExpression();
-        }
-        else if(lexEqual("COND")){
+        } else if (lexEqual("COND")) {
             CondExpression();
-        }
-        else if(lexEqual("IF") || lexEqual("İF")){
+        } else if (lexEqual("IF") || lexEqual("İF")) {
             IfExpression();
-        }
-        else if(lexEqual("BEGIN") || lexEqual("BEGİN")){
+        } else if (lexEqual("BEGIN") || lexEqual("BEGİN")) {
             BeginExpression();
-        }
-        else if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+        } else if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             FunCall();
-        }
-        else{
+        } else {
             error();
         }
 
@@ -175,23 +165,20 @@ public class Parser {
     static void FunCall() {
         announceSyn("FunCall");
 
-        if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+        if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             Expressions();
-        }
-        else{
+        } else {
             error();
         }
-        
 
     }
 
     static void LetExpression() {
         announceSyn("LetExpression");
 
-        if(lexEqual("LET")){
+        if (lexEqual("LET")) {
             LetExpr();
-        }
-        else{
+        } else {
             error();
         }
     }
@@ -201,29 +188,31 @@ public class Parser {
 
         setCurrentLex();
 
-        if(lexEqual("LEFTPAR")){
-            VarDefs();
+        if (lexEqual("LEFTPAR")) {
 
             setCurrentLex();
 
-            if(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")){
-                Statements();
+            if (lexEqual("LEFTPAR")) {
+                VarDefs();
             }
-            else{
+
+            setCurrentLex();
+
+            if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                Statements();
+            } else {
                 error();
             }
-        }
-        else if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+        } else if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             setCurrentLex();
 
-            if(lexEqual("LEFTPAR")){
+            if (lexEqual("LEFTPAR")) {
                 VarDefs();
 
                 setCurrentLex();
-                if(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")){
+                if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
                     Statements();
-                }
-                else{
+                } else {
                     error();
                 }
             }
@@ -235,17 +224,20 @@ public class Parser {
 
         setCurrentLex();
 
-        if(lexEqual("LEFTPAR")){
+        if (lexEqual("LEFTPAR")) {
+
             setCurrentLex();
-            
-            if(lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")){
+
+            if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
+                setCurrentLex();
+
                 Expression();
 
                 setCurrentLex();
-                if(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")){
+
+                if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
                     VarDef();
-                }
-                else{
+                } else {
                     error();
                 }
             }
@@ -259,15 +251,19 @@ public class Parser {
     static void VarDef() {
         announceSyn("VarDef");
 
+        if ( lexList.get(currentIndex).equals("LEFTPAR") ) {
+
+            VarDefs();
+        }
+
     }
 
     static void CondExpression() {
         announceSyn("CondExpression");
 
-        if(lexEqual("COND")){
+        if (lexEqual("COND")) {
             CondBranches();
-        }
-        else{
+        } else {
             error();
         }
 
@@ -276,22 +272,52 @@ public class Parser {
     static void CondBranches() {
         announceSyn("CondBranches");
 
+        setCurrentLex();
+
+        if (lexEqual("LEFTPAR")) {
+            Expression();
+            Statements();
+
+            setCurrentLex();
+
+            if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+                CondBranch();
+            }
+        }
+
     }
 
     static void CondBranch() {
         announceSyn("CondBranch");
 
+        setCurrentLex();
+
+        if (lexEqual("LEFTPAR")) {
+            Expression();
+            Statements();
+
+            setCurrentLex();
+
+            if (!(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))) {
+                error();
+            }
+        } else {
+            return;
+        }
+
     }
 
     static void IfExpression() {
         announceSyn("IfExpression");
+        
 
-        if(lexEqual("IF") || lexEqual("İF")){
+        if (lexEqual("IF") || lexEqual("İF")) {
+            setCurrentLex();
             Expression();
+            setCurrentLex();
             Expression();
             EndExpression();
-        }
-        else{
+        } else {
             error();
         }
 
@@ -300,15 +326,23 @@ public class Parser {
     static void EndExpression() {
         announceSyn("EndExpression");
 
+        setCurrentLex();
+
+        if ((lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
+                || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN") || lexEqual("LEFTPAR"))) {
+            Expression();
+        } else {
+            return;
+        }
+
     }
 
     static void BeginExpression() {
         announceSyn("BeginExpression");
 
-        if(lexEqual("BEGIN") || lexEqual("BEGİN")){
+        if (lexEqual("BEGIN") || lexEqual("BEGİN")) {
             Statements();
-        }
-        else{
+        } else {
             error();
         }
 
