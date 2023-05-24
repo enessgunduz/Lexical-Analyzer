@@ -13,7 +13,9 @@ public class Parser {
 
     public static void StartParse(ArrayList<String> lexs, ArrayList<String> keys) {
         lexList = lexs;
+        System.out.println(lexList);
         keyList = keys;
+        System.out.println(keyList);
         Program();
     }
 
@@ -41,7 +43,7 @@ public class Parser {
 
         SecondLevelForm();
 
-        if (!((lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")))) {
+        if (!((lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")))) {
             error();
         }
         printLex(0);
@@ -58,7 +60,7 @@ public class Parser {
         if (lexEqual("LEFTPAR")) {
             printLex(0);
             FunCall();
-            if (!((lexEqual("RIGHTPAR")) || (lexEqual("RİGHTPAR")))) {
+            if (!(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))) {
                 error();
             }
             printLex(0);
@@ -172,12 +174,12 @@ public class Parser {
             printLex(0);
             Expr();
 
-            setCurrentLex();
 
-            if (!(lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR"))) {
+            if (lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR")) {
+                printLex(0);
+            } else {
                 error();
             }
-            printLex(0);
         } else if (!(lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
                 || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN"))) {
             error();
@@ -196,17 +198,23 @@ public class Parser {
 
         if (lexEqual("LET")) {
             LetExpression();
+            setCurrentLex();
         } else if (lexEqual("COND")) {
             CondExpression();
+            setCurrentLex();
         } else if (lexEqual("IF") || lexEqual("İF")) {
             IfExpression();
+            setCurrentLex();
         } else if (lexEqual("BEGIN") || lexEqual("BEGİN")) {
             BeginExpression();
+            setCurrentLex();
         } else if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             FunCall();
         } else {
             error();
         }
+
+
 
         tabs--;
     }
@@ -323,9 +331,9 @@ public class Parser {
         tabs++;
 
         if ( lexList.get(currentIndex).equals("LEFTPAR") ) {
-
             VarDefs();
-        } else {
+        }
+        else {
             printLex(1);
         }
 
@@ -337,9 +345,11 @@ public class Parser {
         tabs++;
 
         if (lexEqual("COND")) {
+            setCurrentLex();
             printLex(0);
             CondBranches();
-        } else {
+        }
+        else {
             error();
         }
 
@@ -353,17 +363,26 @@ public class Parser {
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
-            printLex(0);
-            Expression();
-            Statements();
-
             setCurrentLex();
-
-            if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+            if (lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
+                    || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN")) {
                 printLex(0);
-                CondBranch();
+                Expression();
+                Statements();
+            }
+            else{
+                error();
             }
         }
+        setCurrentLex();
+        if (lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")) {
+            printLex(0);
+            CondBranch();
+        }
+        else{
+            error();
+        }
+
 
         tabs--;
     }
@@ -375,12 +394,17 @@ public class Parser {
         setCurrentLex();
 
         if (lexEqual("LEFTPAR")) {
+            setCurrentLex();
             printLex(0);
+            if (lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
+                    || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN")) {
+                printLex(0);
+                Expression();
+                Statements();
+            }
             Expression();
             Statements();
-
             setCurrentLex();
-
             if (!(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))) {
                 error();
             }
