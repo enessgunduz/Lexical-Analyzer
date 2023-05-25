@@ -1,26 +1,39 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Parser {
 
     static ArrayList<String> lexList = new ArrayList<>();
     static ArrayList<String> keyList = new ArrayList<>();
+    static ArrayList<Integer> indexList = new ArrayList<>();
+
 
     static int currentIndex = 0;
     static int currentIndexForKey = 0;
-
+    static int currentIndexForIndex = 0;
     static int tabs = 0;
     static String currentLex;
+    static String outputText="";
 
-    public static void StartParse(ArrayList<String> lexs, ArrayList<String> keys) {
+    public static void StartParse(ArrayList<String> lexs, ArrayList<String> keys, ArrayList<Integer> index) throws IOException {
         lexList = lexs;
-        System.out.println(lexList);
         keyList = keys;
-        System.out.println(keyList);
+        indexList = index;
         Program();
+
+        System.out.print(outputText);
+        File myObj = new File("src/syntaxOutput.txt");
+        myObj.createNewFile();
+        FileWriter myWriter = new FileWriter("src/syntaxOutput.txt");
+        myWriter.write(outputText);
+        myWriter.close();
+        System.exit(0);
     }
 
     // Enes Part Start
-    static void Program() {
+    static void Program() throws IOException {
         announceSyn("<Program>");
         tabs++;
 
@@ -36,7 +49,7 @@ public class Parser {
         tabs--;
     }
 
-    static void TopLevelForm() {
+    static void TopLevelForm() throws IOException {
         announceSyn("<TopLevelForm>");
         tabs++;
         printLex(0);
@@ -44,14 +57,14 @@ public class Parser {
         SecondLevelForm();
 
         if (!((lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR")))) {
-            error();
+            error(")");
         }
         printLex(0);
 
         tabs--;
     }
 
-    static void SecondLevelForm() {
+    static void SecondLevelForm() throws IOException {
         announceSyn("<SecondLevelForm>");
         tabs++;
 
@@ -61,7 +74,7 @@ public class Parser {
             printLex(0);
             FunCall();
             if (!(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))) {
-                error();
+                error(")");
             }
             printLex(0);
         } else {
@@ -71,7 +84,7 @@ public class Parser {
         tabs--;
     }
 
-    static void Definition() {
+    static void Definition() throws IOException {
         announceSyn("<Definition>");
         tabs++;
 
@@ -80,12 +93,12 @@ public class Parser {
             DefinitionRight();
         }
         else
-            error();
+            error("define");
 
         tabs--;
     }
 
-    static void DefinitionRight() {
+    static void DefinitionRight() throws IOException {
         announceSyn("<DefinitionRight>");
         tabs++;
 
@@ -105,11 +118,11 @@ public class Parser {
                     Statements();
                 }
                 else
-                    error();
+                    error(")");
             } else
-                error();
+                error("identifier");
         } else
-            error();
+            error("(");
 
         tabs--;
     }
@@ -130,7 +143,7 @@ public class Parser {
         tabs--;
     }
 
-    static void Statements() {
+    static void Statements() throws IOException {
         announceSyn("<Statements>");
         tabs++;
 
@@ -149,7 +162,7 @@ public class Parser {
     // Enes Part End
 
     // Efe Part Start
-    static void Expressions() {
+    static void Expressions() throws IOException {
         announceSyn("<Expressions>");
         tabs++;
 
@@ -166,7 +179,7 @@ public class Parser {
         tabs--;
     }
 
-    static void Expression() {
+    static void Expression() throws IOException {
         announceSyn("<Expression>");
         tabs++;
 
@@ -178,11 +191,11 @@ public class Parser {
             if (lexEqual("RİGHTPAR") || lexEqual("RIGHTPAR")) {
                 printLex(0);
             } else {
-                error();
+                error(")");
             }
         } else if (!(lexEqual("İDENTİFİER") || lexEqual("IDENTIFIER") || lexEqual("NUMBER") || lexEqual("CHAR")
                 || lexEqual("STRING") || lexEqual("STRİNG") || lexEqual("BOOLEAN"))) {
-            error();
+            error("identifier or number or char or string or boolean");
         } else {
             printLex(0);
         }
@@ -190,7 +203,7 @@ public class Parser {
         tabs--;
     }
 
-    static void Expr() {
+    static void Expr() throws IOException {
         announceSyn("<Expr>");
         tabs++;
 
@@ -211,7 +224,7 @@ public class Parser {
         } else if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             FunCall();
         } else {
-            error();
+            error("let or cond or if or begin or identifier");
         }
 
 
@@ -219,7 +232,7 @@ public class Parser {
         tabs--;
     }
 
-    static void FunCall() {
+    static void FunCall() throws IOException {
         announceSyn("<FunCall>");
         tabs++;
 
@@ -227,13 +240,13 @@ public class Parser {
             printLex(0);
             Expressions();
         } else {
-            error();
+            error("identifier");
         }
 
         tabs--;
     }
 
-    static void LetExpression() {
+    static void LetExpression() throws IOException {
         announceSyn("<LetExpression>");
         tabs++;
 
@@ -241,13 +254,13 @@ public class Parser {
             printLex(0);
             LetExpr();
         } else {
-            error();
+            error("let");
         }
 
         tabs--;
     }
 
-    static void LetExpr() {
+    static void LetExpr() throws IOException {
         announceSyn("<LetExpr>");
         tabs++;
 
@@ -268,7 +281,7 @@ public class Parser {
                 printLex(0);
                 Statements();
             } else {
-                error();
+                error(")");
             }
         } else if (lexEqual("IDENTIFIER") || lexEqual("İDENTİFİER")) {
             printLex(0);
@@ -283,7 +296,7 @@ public class Parser {
                     printLex(0);
                     Statements();
                 } else {
-                    error();
+                    error(")");
                 }
             }
         }
@@ -291,7 +304,7 @@ public class Parser {
         tabs--;
     }
 
-    static void VarDefs() {
+    static void VarDefs() throws IOException {
         announceSyn("<VarDefs>");
         tabs++;
 
@@ -314,7 +327,7 @@ public class Parser {
                     printLex(0);
                     VarDef();
                 } else {
-                    error();
+                    error(")");
                 }
             }
         }
@@ -326,7 +339,7 @@ public class Parser {
     // Efe Part End
 
     // Tolga Part Start
-    static void VarDef() {
+    static void VarDef() throws IOException {
         announceSyn("<VarDef>");
         tabs++;
 
@@ -340,7 +353,7 @@ public class Parser {
         tabs--;
     }
 
-    static void CondExpression() {
+    static void CondExpression() throws IOException {
         announceSyn("<CondExpression>");
         tabs++;
 
@@ -350,13 +363,13 @@ public class Parser {
             CondBranches();
         }
         else {
-            error();
+            error("cond");
         }
 
         tabs--;
     }
 
-    static void CondBranches() {
+    static void CondBranches() throws IOException {
         announceSyn("<CondBranches>");
         tabs++;
 
@@ -371,7 +384,7 @@ public class Parser {
                 Statements();
             }
             else{
-                error();
+                error("identifier or number or char or string or boolean");
             }
         }
         setCurrentLex();
@@ -380,14 +393,14 @@ public class Parser {
             CondBranch();
         }
         else{
-            error();
+            error(")");
         }
 
 
         tabs--;
     }
 
-    static void CondBranch() {
+    static void CondBranch() throws IOException {
         announceSyn("<CondBranch>");
         tabs++;
 
@@ -406,7 +419,7 @@ public class Parser {
             Statements();
             setCurrentLex();
             if (!(lexEqual("RIGHTPAR") || lexEqual("RİGHTPAR"))) {
-                error();
+                error(")");
             }
             printLex(0);
         } else {
@@ -416,7 +429,7 @@ public class Parser {
         tabs--;
     }
 
-    static void IfExpression() {
+    static void IfExpression() throws IOException {
         announceSyn("<IfExpression>");
         tabs++;
 
@@ -428,13 +441,13 @@ public class Parser {
             Expression();
             EndExpression();
         } else {
-            error();
+            error("if");
         }
 
         tabs--;
     }
 
-    static void EndExpression() {
+    static void EndExpression() throws IOException {
         announceSyn("<EndExpression>");
         tabs++;
 
@@ -450,7 +463,7 @@ public class Parser {
         tabs--;
     }
 
-    static void BeginExpression() {
+    static void BeginExpression() throws IOException {
         announceSyn("<BeginExpression>");
         tabs++;
 
@@ -458,7 +471,7 @@ public class Parser {
             printLex(0);
             Statements();
         } else {
-            error();
+            error("begin");
         }
 
         tabs--;
@@ -472,28 +485,34 @@ public class Parser {
 
     static void setCurrentLex() {
         currentLex = lexList.get(currentIndex++);
+        currentIndexForIndex+=2;
     }
 
     static void announceSyn(String s) {
         for (int i = 0; i < tabs; i++) {
-            System.out.print("      ");
+            outputText+=" ";
         }
-        System.out.println(s);
-
+        outputText+=s+"\n";
     }
 
     static void printLex(int cond){
         for (int i = 0; i < tabs; i++) {
-            System.out.print("      ");
+            outputText+=" ";
         }
         if (cond==0)
-            System.out.println(currentLex+" ("+keyList.get(currentIndexForKey++)+")");
+            outputText += currentLex+" ("+keyList.get(currentIndexForKey++)+")\n";
         else
-            System.out.println(" ---- ");
+            outputText += "-\n";
     }
 
-    static void error() {
-        System.out.println("Error at :" + currentIndex + " " + currentLex);
+    static void error(String expected) throws IOException {
+        outputText+="SYNTAX ERROR [" + indexList.get(currentIndexForIndex-2) + ":" + indexList.get(currentIndexForIndex-1)+"]: '"+expected+"' is expected";
+        System.out.print(outputText);
+        File myObj = new File("src/syntaxOutput.txt");
+        myObj.createNewFile();
+        FileWriter myWriter = new FileWriter("src/syntaxOutput.txt");
+        myWriter.write(outputText);
+        myWriter.close();
         System.exit(0);
     }
 

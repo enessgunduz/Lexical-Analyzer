@@ -17,6 +17,7 @@ public class Main {
     static String outputText = "";
     static ArrayList<String> lexs = new ArrayList<>();
     static ArrayList<String> keys = new ArrayList<>();
+    static ArrayList<Integer> index = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         System.out.print("Name of the input file:");
@@ -75,12 +76,12 @@ public class Main {
             line = readLn(br);
             if (line == null) {
                 //System.out.println(outputText);
-                File myObj = new File("src/output.txt");
+                File myObj = new File("src/lexOutput.txt");
                 myObj.createNewFile();
-                FileWriter myWriter = new FileWriter("src/output.txt");
+                FileWriter myWriter = new FileWriter("src/lexOutput.txt");
                 myWriter.write(outputText);
                 myWriter.close();
-                Parser.StartParse(lexs, keys);
+                Parser.StartParse(lexs, keys, index);
                 System.exit(0);
             }
         }
@@ -160,6 +161,8 @@ public class Main {
         }
 
         keys.add(word);
+        index.add(currentLine);
+        index.add(outputIndex);
 
     }
 
@@ -208,6 +211,8 @@ public class Main {
         outputText += "CHAR " + currentLine + ":" + outputIndex + "\n";
         lexs.add("CHAR");
         keys.add(String.valueOf(ch));
+        index.add(currentLine);
+        index.add(outputIndex);
         readNextCh(line);
 
     }
@@ -238,6 +243,8 @@ public class Main {
         outputText += "STRING " + currentLine + ":" + outputIndex + "\n";
         lexs.add("STRING");
         keys.add(s);
+        index.add(currentLine);
+        index.add(outputIndex);
         readNextCh(line);
 
     }
@@ -254,19 +261,21 @@ public class Main {
             currentIndex++;
             identifierLiteral(br, line, outputIndex);
             keys.add(String.valueOf(ch));
+            index.add(currentLine);
+            index.add(outputIndex);
             return;
         }
-
+        s+=String.valueOf(ch);
         if (ch == '.') {
-            floatLiteral(br, line, 0, outputIndex);
+            floatLiteral(br, line, 0, outputIndex, s);
             return;
         } else if (ch == '0') { // Could be hex or bin
             hexOrBin = true;
         }
-        s+=String.valueOf(ch);
+
         ch = readNextCh(line);
         if (ch == '.') {
-            floatLiteral(br, line, 0, outputIndex);
+            floatLiteral(br, line, 0, outputIndex,s);
             return;
         }
 
@@ -304,10 +313,10 @@ public class Main {
             while (true) {
                 ch = readNextCh(line);
                 if (ch == 'e' || ch == 'E') {
-                    floatLiteral(br, line, 1, outputIndex);
+                    floatLiteral(br, line, 1, outputIndex,s);
                     return;
                 } else if (ch == '.') {
-                    floatLiteral(br, line, 0, outputIndex);
+                    floatLiteral(br, line, 0, outputIndex,s);
                     return;
                 }
                 if (bracketCond(ch) || ch == ' ' || ch == '#') {
@@ -327,12 +336,13 @@ public class Main {
 
         lexs.add("NUMBER");
         keys.add(s);
+        index.add(currentLine);
+        index.add(outputIndex);
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
     }
 
-    public static void floatLiteral(BufferedReader br, String line, int cond, int outputIndex) throws IOException {
+    public static void floatLiteral(BufferedReader br, String line, int cond, int outputIndex, String s) throws IOException {
         char ch;
-        String s = "";
         ch = readNextCh(line);
         s += String.valueOf(ch);
         if (cond == 0) {
@@ -342,7 +352,7 @@ public class Main {
             while (decCond(ch)) {
                 ch = readNextCh(line);
                 if (ch == 'e' || ch == 'E') {
-                    floatLiteral(br, line, 1, outputIndex);
+                    floatLiteral(br, line, 1, outputIndex,s);
                     return;
                 }
                 if (bracketCond(ch) || ch == ' ') {
@@ -379,6 +389,8 @@ public class Main {
         outputText += "NUMBER " + currentLine + ":" + outputIndex + "\n";
         lexs.add("NUMBER");
         keys.add(s);
+        index.add(currentLine);
+        index.add(outputIndex);
 
     }
 
@@ -408,6 +420,8 @@ public class Main {
         }
 
         keys.add(String.valueOf(ch));
+        index.add(currentLine);
+        index.add(currentIndex);
     }
 
     public static boolean hexCond(char ch) {
